@@ -66,7 +66,7 @@ const getItemFikh = async (link) => {
             description.push(isi);
         });
         
-        image = image.substring(2, image.length);
+        image = `https://${image.substring(2, image.length)}`;
 
         article = {
             title,
