@@ -1,6 +1,8 @@
 const express = require('express');
 const cheerio = require('cheerio');
 const fetch = require('node-fetch');
+const replaceString = require('replace-string');
+const https = require('https');
 const app = express();
 
 app.get('/', (req,res) => {
@@ -25,6 +27,61 @@ app.get('/link/:link', async (req,res) => {
     res.end();
     
 });
+
+app.get('/quran/', (req,res) => {
+    getListSurat((response) => {
+        res.write(response);
+        res.end();
+    });
+    
+});
+
+app.get('/quran/:surat', (req,res) => {
+    const surat = req.params.surat;
+
+    getDetailSurat(surat, (response) => {
+        res.write(response);
+        res.end();
+
+    });
+    
+});
+
+const getListSurat = (callback) => {
+    https.get('https://al-quran-8d642.firebaseio.com/data.json', (resp) => {
+    let data = '';
+
+    resp.on('data', (chunk) => {
+        data += chunk;
+    });
+    
+    resp.on('end', () => {
+        return callback(data);
+    });
+    
+    }).on("error", (err) => {
+        
+    console.log("Error: " + err.message);
+    });
+};
+
+const getDetailSurat = (surat, callback) => {
+    https.get(`https://al-quran-8d642.firebaseio.com/surat/${surat}.json`, (resp) => {
+    let data = '';
+
+    resp.on('data', (chunk) => {
+        data += chunk;
+    });
+    
+    resp.on('end', () => {
+        return callback(data);
+    });
+    
+    }).on("error", (err) => {
+        
+    console.log("Error: " + err.message);
+    });
+};
 
 const getItemFikh = async (link) => {
     const url = `https://konsultasisyariah.com/${link}.html`
@@ -59,13 +116,13 @@ const getItemFikh = async (link) => {
             image = $part.find('.td-post-featured-image > figure > a').attr('href');
         });
 
-        $item.find('.td-post-content > p').each((i,part) => {
+        $item.find('.td-post-content').each((i,part) => {
             const $part = $(part);
-            const isi = $part.text();
-
-            description.push(isi);
+            const isi = $part.html();
+            var desc = replaceString(isi,`<p>Anda bisa membaca artikel ini melalui aplikasi&#xA0;<a href=\"https://play.google.com/store/apps/details?id=org.yufid.tanyaustadz\" target=\"_blank\" rel=\"noopener\"><strong>Tanya Ustadz untuk Android</strong></a>.<br>\n<a href=\"https://play.google.com/store/apps/details?id=org.yufid.tanyaustadz\" target=\"_blank\" rel=\"noopener\"><strong>Download Sekarang !!</strong></a></p>\n<p><strong>Dukung Yufid dengan menjadi SPONSOR dan DONATUR.</strong></p>\n<ul>\n<li><strong>REKENING DONASI</strong>&#xA0;: BNI SYARIAH 0381346658 /&#xA0;BANK SYARIAH MANDIRI 7086882242 a.n. YAYASAN YUFID NETWORK</li>\n<li><strong>KONFIRMASI DONASI</strong>&#xA0;hubungi: 087-738-394-989</li>\n</ul>\n`, "");
+            description.push(desc);
         });
-        
+
         image = `https://${image.substring(2, image.length)}`;
 
         article = {
