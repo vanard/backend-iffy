@@ -19,6 +19,15 @@ app.get('/page/:page', async (req,res) => {
     
 });
 
+app.get('/category/:type', async (req,res) => {
+    const type = req.params.type;
+    
+    const a = await getCategoryFikh(type);
+    res.write(JSON.stringify(a));
+    res.end();
+    
+});
+
 app.get('/link/:link', async (req,res) => {
     const link = req.params.link;
     
@@ -81,6 +90,52 @@ const getDetailSurat = (surat, callback) => {
         
     console.log("Error: " + err.message);
     });
+};
+
+const getCategoryFikh = async (type) => {
+    const url = `https://konsultasisyariah.com/category/fikih/${type}`
+    const response = await fetch(url);
+    const body = await response.text();
+    const $ = cheerio.load(body);
+
+    const promises = [];
+
+    $('.item-details').each((i, item) => {
+        const $item = $(item);
+        let title;
+        let choose;
+        let dateTime;
+        let date;
+
+        $item.find('h3[class="entry-title td-module-title"] > a').each((i,part) => {
+            const $part = $(part);
+            title = $part.attr('title');
+            choose = $part.attr('href');
+        });
+
+        $item.find('time[class="entry-date updated td-module-date"]').each((i,part) => {
+            const $part = $(part);
+            dateTime = $part.attr('datetime');
+            date = $part.text();
+        });
+
+        const chosen = choose.split('/')[3];
+        const link = chosen.split('.')[0];
+
+        fikh = {
+            title,
+            link,
+            dateTime,
+            date,
+            choose
+        }
+
+        promises.push(fikh);
+
+    });
+
+    await Promise.all(promises);
+    return promises;
 };
 
 const getItemFikh = async (link) => {
