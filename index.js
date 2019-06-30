@@ -56,6 +56,117 @@ app.get('/quran/:surat', (req,res) => {
     
 });
 
+app.get('/hadist', async (req,res) => {
+    const a = await getHadistKitab();
+    res.write(JSON.stringify(a));
+    res.end();
+    
+});
+
+app.get('/hadist/:kitab', async (req,res) => {
+    const kitab = req.params.kitab;
+    const page = req.query.page;
+
+    if(page == null) {
+        res.write("Input page parameter");
+        return res.end();
+    }
+
+    const a = await getKitab(kitab, page);
+    res.write(JSON.stringify(a));
+    res.end();
+    
+});
+
+const getHadistKitab = async () => {
+    const url = `https://tafsirq.com/hadits`
+    const response = await fetch(url);
+    const body = await response.text();
+    const $ = cheerio.load(body);
+
+    const promises = [];
+
+    $('.col-md-6 > .row > .col-md-4 > .panel > .panel-body').each((i, item) => {
+        const $item = $(item);
+        let kitab;
+        let kitab_link;
+        let jumlah;
+
+        $item.find('h3 > a').each((i,part) => {
+            const $part = $(part);
+            kitab = $part.text();
+            kitab_link = $part.attr('href');
+        });
+
+        $item.find('.text-muted').each((i,part) => {
+            const $part = $(part);
+            jumlah = $part.text();
+        });
+
+        const code_kitab = kitab_link.split('/')[4];
+        
+        hadist = {
+            kitab,
+            kitab_link,
+            code_kitab,
+            jumlah
+        }
+
+        promises.push(hadist);
+
+    });
+
+    await Promise.all(promises);
+    return promises;
+
+};
+
+const getKitab = async (kitab, page) => {
+    const url = `https://tafsirq.com/hadits/${kitab}?page=${page}`
+    const response = await fetch(url);
+    const body = await response.text();
+    const $ = cheerio.load(body);
+
+    const promises = [];
+
+    $('.col-md-6 > .row > .panel').each((i, item) => {
+        const $item = $(item);
+        let title;
+        let title_link;
+        let arab_hadist;
+        let arti_hadist;
+
+        $item.find('.panel-heading > h2 > a').each((i,part) => {
+            const $part = $(part);
+            title = $part.text();
+            title_link = $part.attr('href');
+        });
+
+        $item.find('.panel-body > p').each((i,part) => {
+            const $part = $(part);
+            arti_hadist = $part.text();
+        });
+
+        $item.find('.panel-body > p[class="arabic"]').each((i,part) => {
+            const $part = $(part);
+            arab_hadist = $part.text();
+        });
+        
+        kitab = {
+            title,
+            title_link,
+            arab_hadist,
+            arti_hadist
+        }
+
+        promises.push(kitab);
+
+    });
+
+    await Promise.all(promises);
+    return promises;
+};
+
 const getListSurat = (callback) => {
     https.get('https://al-quran-8d642.firebaseio.com/data.json', (resp) => {
     let data = '';
