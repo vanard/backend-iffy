@@ -6,6 +6,11 @@ https://iffy-ta.herokuapp.com/page/?page
 ex : https://iffy-ta.herokuapp.com/page/1
 
 
+https://iffy-ta.herokuapp.com/link/?link
+
+ex : https://iffy-ta.herokuapp.com/link/35172-hukum-shalat-gerhana-bulan-setelah-subuh
+
+
 https://iffy-ta.herokuapp.com/category/?type
 
 ex : https://iffy-ta.herokuapp.com/category/fikih
