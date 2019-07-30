@@ -279,7 +279,7 @@ const getItemFikh = async (link) => {
 
         $item.find('.td-post-content').each((i,part) => {
             const $part = $(part);
-            image = $part.find('.td-post-featured-image > figure > a').attr('href');
+            image = $part.find('.td-post-featured-image > a').attr('href');
         });
 
         $item.find('.td-post-content').each((i,part) => {
