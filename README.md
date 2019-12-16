@@ -1,5 +1,7 @@
 # backend-iffy
-Backend API for Fikh App by Team Iffy
+Backend API for Fikh App by Scapping Web from KonsultasiSyariah.com
+
+![image](https://user-images.githubusercontent.com/25784574/70874985-06c98d00-1fe7-11ea-8c71-136840af8566.png)
 
 https://iffy-ta.herokuapp.com/page/?page
 
