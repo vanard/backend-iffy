@@ -297,7 +297,7 @@ const getItemFikh = async (link) => {
             title,
             author,
             date,
-            category : category,
+            category : category.join('\n'),
             image,
             description : description.join('\n')
         }
