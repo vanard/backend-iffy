@@ -257,29 +257,28 @@ const getItemFikh = async (link) => {
 
     const promises = [];
 
-    $('.td-ss-main-content > article').each((i, item) => {
+    $('.post').each((i, item) => {
         const $item = $(item);
         const category = [];
         let title, author, date, image;
+        const description = [];
 
-        $item.find('.td-post-header > ul[class="td-category"] > .entry-category').each((i,part) => {
+        $item.find('.entry-category').each((i,part) => {
             const $part = $(part);
             const cat = $part.find('a').text();
             category.push(cat);
         });
 
-        $item.find('header[class="td-post-title"]').each((i,part) => {
+        $item.find('.td-post-title').each((i,part) => {
             const $part = $(part);
             title = $part.find('.entry-title').text();
             author = $part.find('.td-post-author-name > a').text();
-            date = $part.find('time[class="entry-date updated td-module-date"]').text();
+            date = $part.find('.entry-date').text();
         });
 
-        const description = [];
-
-        $item.find('.td-post-content').each((i,part) => {
+        $item.find('.td-post-featured-image > a').each((i,part) => {
             const $part = $(part);
-            image = $part.find('.td-post-featured-image > figure > a').attr('href');
+            image = $part.find('.td-modal-image').attr('src');
         });
 
         $item.find('.td-post-content').each((i,part) => {
@@ -294,13 +293,11 @@ const getItemFikh = async (link) => {
             description.push(desc);
         });
 
-        image = `https://${image.substring(2, image.length)}`;
-
         article = {
             title,
             author,
             date,
-            category : category.join('\n'),
+            category : category,
             image,
             description : description.join('\n')
         }
@@ -322,34 +319,41 @@ const getFikh = async (page) => {
 
     const promises = [];
 
-    $('.item-details').each((i, item) => {
+    $('.td_module_6').each((i, item) => {
         const $item = $(item);
         let title;
         let choose;
         let dateTime;
         let date;
+        let thumb;
 
         $item.find('h3[class="entry-title td-module-title"] > a').each((i,part) => {
             const $part = $(part);
             title = $part.attr('title');
             choose = $part.attr('href');
         });
-
+        
         $item.find('time[class="entry-date updated td-module-date"]').each((i,part) => {
             const $part = $(part);
             dateTime = $part.attr('datetime');
             date = $part.text();
         });
 
+        $item.find('.entry-thumb').each((i,part) => {
+            const $part = $(part);
+            thumb = $part.attr('src');
+        });
+
         const chosen = choose.split('/')[3];
         const link = chosen.split('.')[0];
-
+        
         fikh = {
             title,
             link,
             dateTime,
             date,
-            choose
+            choose,
+            thumb
         }
 
         promises.push(fikh);
